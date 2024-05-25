@@ -1,19 +1,16 @@
-from aadiscordbot.cogs.utils.decorators import (
-    message_in_channels,
-    sender_has_any_perm,
-    sender_has_perm,
-)
+from aadiscordbot.cogs.utils.decorators import sender_has_any_perm, sender_has_perm
+from corpstats import models
+from discord import AutocompleteContext, Embed, option
+from discord.colour import Color
+from discord.commands import SlashCommandGroup
+from discord.ext import commands
+
+from django.conf import settings
+from django.core.exceptions import ObjectDoesNotExist
+
 from allianceauth.eveonline.models import EveAllianceInfo, EveCorporationInfo
 from allianceauth.services.hooks import get_extension_logger
 from allianceauth.services.modules.discord.models import DiscordUser
-from corpstats import models
-from discord import AutocompleteContext, Embed, InputTextStyle, Interaction, option
-from discord.colour import Color
-from discord.commands import SlashCommandGroup
-from discord.embeds import Embed
-from discord.ext import commands
-from django.conf import settings
-from django.core.exceptions import ObjectDoesNotExist
 
 logger = get_extension_logger(__name__)
 
@@ -55,17 +52,17 @@ class Compliance(commands.Cog):
             ) = corp.get_stats()
 
             embed.set_thumbnail(url=corp.corp_logo())
-            embed.add_field(name=f"Mains", value=total_mains, inline=True)
-            embed.add_field(name=f"Members", value=total_members, inline=True)
-            embed.add_field(name=f"Unregistered", value=total_unreg, inline=True)
+            embed.add_field(name="Mains", value=total_mains, inline=True)
+            embed.add_field(name="Members", value=total_members, inline=True)
+            embed.add_field(name="Unregistered", value=total_unreg, inline=True)
             svcstring = ""
             for service in services:
                 svcstring += "{svc}: {svcpct}\n".format(
                     svc=service, svcpct=service_percent[service]["percent"]
                 )
-            embed.add_field(name=f"Services", value=svcstring, inline=False)
+            embed.add_field(name="Services", value=svcstring, inline=False)
             embed.add_field(
-                name=f"Unregistered Characters",
+                name="Unregistered Characters",
                 value="\n".join(str(x) for x in unregistered),
                 inline=False,
             )
@@ -179,7 +176,7 @@ class Compliance(commands.Cog):
             profile = user.profile
             mchar = profile.main_character
             corp = mchar.corporation_name
-        except:
+        except Exception:
             logger.error("Could not figure out who made the request")
             pass
         await ctx.defer(ephemeral=True)
