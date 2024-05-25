@@ -8,7 +8,7 @@ dynamic = ["version", "description"]
 readme = "README.md"
 license = { file = "LICENSE" }
 requires-python = ">=3.8"
-authors = [{ name = "AstrumMechanica", email = "astrummechanica@gmail.com" }]
+authors = [{ name = "swashman", email = "jnelson2288@gmail.com" }]
 classifiers = [
     "Environment :: Web Environment",
     "Framework :: Django",
@@ -29,11 +29,9 @@ dependencies = ["allianceauth>=4", "allianceauth-discordbot"]
 
 
 [project.urls]
-Homepage = "https://gitlab.com/ErikKalkoken/allianceauth-example-plugin"
-Documentation = "https://allianceauth-example-plugin.readthedocs.io/en/latest/"
-Source = "https://gitlab.com/ErikKalkoken/allianceauth-example-plugin"
-Changelog = "https://gitlab.com/ErikKalkoken/allianceauth-example-plugin/-/blob/master/CHANGELOG.md"
-Tracker = "https://gitlab.com/ErikKalkoken/allianceauth-example-plugin/-/issues"
+Homepage = "https://github.com/swashman/lawn-compliance"
+Documentation = "https://github.com/swashman/lawn-compliance#readme"
+Issues = "https://github.com/swashman/lawn-compliance/issues"
 
 [tool.hatch.version]
 path = "lawn_compliance/__init__.py"
