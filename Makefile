@@ -1,5 +1,5 @@
-appname = example
-package = example
+appname = lawn_compliance
+package = lawn_compliance
 
 # Default goal
 .DEFAULT_GOAL := help

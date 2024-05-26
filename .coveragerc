@@ -1,6 +1,6 @@
 [run]
 branch = True
-source = example
+source = lawn_compliance
 
 [report]
 exclude_lines =
