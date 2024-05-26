@@ -1,71 +1,47 @@
 [build-system]
-requires = ["hatchling"]
 build-backend = "hatchling.build"
+requires = [
+    "hatchling",
+]
 
 [project]
 name = "lawn-compliance"
-dynamic = ["version", "description"]
+description = "Lawn Compliance app and tasks"
 readme = "README.md"
 license = { file = "LICENSE" }
+authors = [{ name = "Swashman(John Nelson)", email = "jnelson2288@gmail.com" }]
 requires-python = ">=3.8"
-authors = [{ name = "swashman", email = "jnelson2288@gmail.com" }]
 classifiers = [
     "Environment :: Web Environment",
     "Framework :: Django",
-    "Framework :: Django :: 4.0",
     "Framework :: Django :: 4.2",
     "Intended Audience :: Developers",
-    "License :: OSI Approved :: MIT License",
+    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
     "Operating System :: OS Independent",
     "Programming Language :: Python",
+    "Programming Language :: Python :: 3 :: Only",
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
     "Topic :: Internet :: WWW/HTTP",
     "Topic :: Internet :: WWW/HTTP :: Dynamic Content",
 ]
-dependencies = ["allianceauth>=4", "allianceauth-discordbot"]
-
-
+dynamic = [
+    "version",
+]
+dependencies = [
+    "allianceauth<5.0.0,>=4",
+    "allianceauth-discordbot",
+]
 [project.urls]
-Homepage = "https://github.com/swashman/lawn-compliance"
 Documentation = "https://github.com/swashman/lawn-compliance#readme"
+Homepage = "https://github.com/swashman/lawn-compliance"
 Issues = "https://github.com/swashman/lawn-compliance/issues"
 
 [tool.hatch.version]
 path = "lawn_compliance/__init__.py"
 
-[tool.isort]
-profile = "black"
-multi_line_output = 3
-sections = [
-    "FUTURE",
-    "STDLIB",
-    "THIRDPARTY",
-    "DJANGO",
-    "ALLIANCEAUTH",
-    "FIRSTPARTY",
-    "LOCALFOLDER",
-]
-known_allianceauth = ["allianceauth", "app_utils"]
-known_django = ["django", "django_webtest", "esi", "eveuniverse"]
-
-[tool.pylint.'MASTER']
-ignore-patterns = ["__init__.py", "auth_hooks.py", "apps.py", "admin.py"]
-ignore-paths = ["^.*/tests/.*$", "^.*/migrations/.*$"]
-
-[tool.pylint.'BASIC']
-good-names = ["i", "j", "k", "ex"]
-
-[tool.pylint.'FORMAT']
-max-line-length = 120
-
-[tool.pylint.'MESSAGES CONTROL']
-disable = [
-    "cyclic-import",
-    "fixme",
-    "import-outside-toplevel",
-    "imported-auth-user",
-    "too-few-public-methods",
-]
+[tool.hatch.build]
+include = ["/lawn_compliance"]

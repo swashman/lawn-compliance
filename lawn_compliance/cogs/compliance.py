@@ -31,7 +31,7 @@ class Compliance(commands.Cog):
 
     # generates a corp embed
     def get_corp_embed(self, input_corp):
-        embed = Embed(title="{corp_name} Compliance".format(corp_name=input_corp))
+        embed = Embed(title=f"{input_corp} Compliance")
         try:
             corp = models.CorpStat.objects.get(
                 corp_id__corporation_name__iexact=input_corp
@@ -84,7 +84,7 @@ class Compliance(commands.Cog):
             )
             corpstring = ""
             for corp in corps:
-                corpstring += "**{c}**\n".format(c=corp)
+                corpstring += f"**{corp}**\n"
                 try:
                     cstat = models.CorpStat.objects.get(
                         corp_id__corporation_name__iexact=corp
@@ -103,9 +103,9 @@ class Compliance(commands.Cog):
                         tracking,
                         services,
                     ) = cstat.get_stats()
-                    corpstring += "Mains:{x}\n".format(x=total_mains)
-                    corpstring += "Members:{x}\n".format(x=total_members)
-                    corpstring += "Unregistered:{x}\n\n".format(x=total_unreg)
+                    corpstring += f"Mains:{total_mains}\n"
+                    corpstring += f"Members:{total_members}\n"
+                    corpstring += f"Unregistered:{total_unreg}\n\n"
                 except models.CorpStat.DoesNotExist:
                     corpstring += "!!! THIS CORP IS NOT REGISTERED !!!\n\n"
             embed.description = corpstring

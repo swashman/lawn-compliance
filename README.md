@@ -29,18 +29,18 @@ LAWN_COMPLIANCE_CHANNELS = [
 
 ## Permissions
 
-| Name                     | Description                                                |
-| ------------------------ | ---------------------------------------------------------- |
-| `lawn_compliance.alliance` | Can view all compliance levels. |
-| `lawn_compliance.any_corp` | Can view any corp and own corp compliance data.    |
-| `lawn_compliance.own_corp` | Can view own corp compliance data.  |
+| Name                       | Description                                     |
+| -------------------------- | ----------------------------------------------- |
+| `lawn_compliance.alliance` | Can view all compliance levels.                 |
+| `lawn_compliance.any_corp` | Can view any corp and own corp compliance data. |
+| `lawn_compliance.own_corp` | Can view own corp compliance data.              |
 
 ## Bot slash Commands
 
 all commands begin with /compliance
 
-|Command |  Description |
-|--- | --- |
-|`alliance` | returns basic data of all corps|
-|`corp` | returns corp specific data for selected corp|
-|`mycorp` | returns corp specific data for own corp|
+| Command    | Description                                  |
+| ---------- | -------------------------------------------- |
+| `alliance` | returns basic data of all corps              |
+| `corp`     | returns corp specific data for selected corp |
+| `mycorp`   | returns corp specific data for own corp      |
