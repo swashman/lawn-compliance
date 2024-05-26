@@ -3,6 +3,7 @@
 Lawn Compliance cogs and tasks
 
 [![license](https://img.shields.io/badge/license-MIT-green)](https://github.com/swashman/lawn-compliance/blob/master/LICENSE)
+![Python](https://img.shields.io/python/required-version-toml?tomlFilePath=https%3A%2F%2Fraw.githubusercontent.com%2Fswashman%2Flawn-compliance%2Fmaster%2Fpyproject.toml)
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
