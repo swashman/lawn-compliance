@@ -2,9 +2,9 @@
 
 Lawn Compliance cogs and tasks
 
-![License](https://img.shields.io/badge/license-MIT-green)
-![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)
-![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)(<https://github.com/psf/black>)
+[![license](https://img.shields.io/badge/license-MIT-green)](https://github.com/swashman/lawn-compliance/blob/master/LICENSE)
+[![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
 ## Installing into production AA
 
