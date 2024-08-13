@@ -9,6 +9,5 @@ LAWN_COMPLIANCE_COGS = getattr(
     "LAWN_COMPLIANCE_COGS",
     [
         "lawn_compliance.cogs.compliance",
-        "lawn_compliance.cogs.pagetest",
     ],
 )
