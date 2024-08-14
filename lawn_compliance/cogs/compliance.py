@@ -82,7 +82,7 @@ class Compliance(commands.Cog):
             # Add each chunk as a separate embed field
             for i, chunk in enumerate(chunks):
                 embed.add_field(
-                    name=f"Unregistered Characters (Part {i+1})",
+                    name=f"Unregistered Characters (Part {i + 1})",
                     value=chunk,
                     inline=False,
                 )
