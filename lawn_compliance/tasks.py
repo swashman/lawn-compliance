@@ -12,6 +12,8 @@ from allianceauth.eveonline.models import EveAllianceInfo, EveCorporationInfo
 from allianceauth.services.hooks import get_extension_logger
 from allianceauth.services.tasks import QueueOnce
 
+from lawn_compliance.utils import utils
+
 logger = get_extension_logger(__name__)
 
 
@@ -30,7 +32,7 @@ def send_alliance_compliance(self):
         )
         corpstring = ""
         for corp in corps:
-            corpstring += f"**{corp}**\n"
+            corpstring += f"**{corp}**"
             try:
                 cstat = models.CorpStat.objects.get(
                     corp_id__corporation_name__iexact=corp
@@ -49,15 +51,16 @@ def send_alliance_compliance(self):
                     tracking,
                     services,
                 ) = cstat.get_stats()
+                corpstring += f" - {utils.time_since(cstat.last_update)}\n"
                 corpstring += f"Mains:{total_mains}\n"
                 corpstring += f"Members:{total_members}\n"
                 corpstring += f"Unregistered:{total_unreg}\n\n"
             except models.CorpStat.DoesNotExist:
-                corpstring += "!!! THIS CORP IS NOT REGISTERED !!!\n\n"
+                corpstring += "\n!!! THIS CORP IS NOT REGISTERED !!!\n\n"
         embed.description = corpstring
         embed.colour = Color.blurple()
     except ObjectDoesNotExist:
-        logger.error("Alliance or corp data doesnot exist in the database")
+        logger.error("Alliance or corp data does not exist in the database")
         embed.description = "An error has occured, please contact IT"
         embed.color = Color.red()
     send_message(embed=embed, channel_id=channel_id)

@@ -34,6 +34,7 @@ class Compliance(commands.Cog):
     )
 
     # generates a corp embed
+
     def get_corp_embed(self, input_corp):
         embed = Embed(title=f"{input_corp} Compliance")
         try:
@@ -59,10 +60,22 @@ class Compliance(commands.Cog):
             embed.add_field(name="Mains", value=total_mains, inline=True)
             embed.add_field(name="Members", value=total_members, inline=True)
             embed.add_field(name="Unregistered", value=total_unreg, inline=True)
+
             svcstring = ""
             for service in services:
-                svcstring += "{svc}: {svcpct}\n".format(
-                    svc=service, svcpct=service_percent[service]["percent"]
+                percent = service_percent[service]["percent"]
+                # Add icons based on the percentage
+                if percent == 100.0:
+                    icon = "✅"
+                elif percent >= 75.0:
+                    icon = "🟡"
+                elif percent >= 50.0:
+                    icon = "🟠"
+                else:
+                    icon = "🔴"
+
+                svcstring += "{icon} {svc}: {svcpct}%\n".format(
+                    icon=icon, svc=service, svcpct=percent
                 )
             embed.add_field(name="Services", value=svcstring, inline=False)
 
@@ -153,17 +166,21 @@ class Compliance(commands.Cog):
         """
         Returns persons own corp compliance data
         """
+        await ctx.defer(ephemeral=True)
         try:
             duser = DiscordUser.objects.get(uid=ctx.author.id)
             user = duser.user
             profile = user.profile
             mchar = profile.main_character
             corp = mchar.corporation_name
+            await ctx.respond(embed=self.get_corp_embed(corp), ephemeral=True)
         except Exception:
             logger.error("Could not figure out who made the request")
+            await ctx.respond(
+                message="Corp token missing from Corporation Stats Module! Please add your token in alliance auth!",
+                ephemeral=True,
+            )
             pass
-        await ctx.defer(ephemeral=True)
-        await ctx.respond(embed=self.get_corp_embed(corp), ephemeral=True)
 
 
 def setup(bot):
