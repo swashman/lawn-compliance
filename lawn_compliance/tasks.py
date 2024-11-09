@@ -24,8 +24,7 @@ THRESHOLD_DAYS = getattr(settings, "THRESHOLD_DAYS", 5)
 
 
 @shared_task(bind=True, base=QueueOnce)
-def send_alliance_compliance(self):
-    channel_id = settings.LAWN_COMPLIANCE_CHANNEL[0]
+def send_alliance_compliance(self, channel_id=settings.LAWN_COMPLIANCE_CHANNEL[0]):
     if not channel_id:
         return "No Channel ID set"
 

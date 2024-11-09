@@ -61,14 +61,18 @@ class Compliance(commands.Cog):
         name="alliance", guild_ids=[int(settings.DISCORD_GUILD_ID)], pass_context=True
     )
     @sender_has_perm("lawn_compliance.alliance")
-    @message_in_channels(settings.LAWN_COMPLIANCE_CHANNEL)
+    # @message_in_channels(settings.LAWN_COMPLIANCE_CHANNEL)
     async def alliance(self, ctx):
         """
         Returns basic compliance data for all corps in the alliance
         """
-        await ctx.defer(ephemeral=True)
-        send_alliance_compliance.delay()
-        await ctx.respond("Requested Alliance Compliance", ephemeral=True)
+        await ctx.defer(ephemeral=False)
+        channel_id = ctx.channel.id
+        send_alliance_compliance.delay(channel_id=channel_id)
+        await ctx.respond(
+            "Requested Alliance Compliance. It will be shown here momentarily.",
+            ephemeral=False,
+        )
 
     # any corp command
     @compliance_commands.command(
