@@ -44,7 +44,9 @@ def send_alliance_compliance(self):
         for corp in corps:
             # Add the header for each corporation
             corpstring += f"## {corp}\n"
-
+            outdated_tokens = []
+            missing_tokens = []
+            yellow_tokens = []
             # Populate data for the corporation
             try:
                 cstat = CorpStat.objects.get(corp_id__corporation_name__iexact=corp)
@@ -72,12 +74,9 @@ def send_alliance_compliance(self):
                     corpstring += "🟢 **Unregistered Toons:** All Registered\n"
 
             except CorpStat.DoesNotExist:
-                corpstring += "🔴 Corp Stats Token Missing!\n"
+                missing_tokens.append("Corp Stats")
 
             # Token checks for outdated and missing
-            outdated_tokens = []
-            missing_tokens = []
-            yellow_tokens = []
 
             # Corp Tools check
             try:
@@ -220,7 +219,7 @@ def send_corp_compliance(self, input_corp, channel_id=None, user_id=None):
         # Services Compliance Section
         corpstring += "**Services Compliance**\n"
         for service in services:
-            percent = service_percent[service]["percent"]
+            percent = round(service_percent[service]["percent"])
             icon = (
                 "✅"
                 if percent == 100.0
