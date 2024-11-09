@@ -3,18 +3,17 @@ from aadiscordbot.cogs.utils.decorators import (
     sender_has_any_perm,
     sender_has_perm,
 )
-from corpstats import models
-from discord import AutocompleteContext, Embed, option
-from discord.colour import Color
+from discord import AutocompleteContext, option
 from discord.commands import SlashCommandGroup
 from discord.ext import commands
 
 from django.conf import settings
 
+from allianceauth.eveonline.models import EveAllianceInfo, EveCorporationInfo
 from allianceauth.services.hooks import get_extension_logger
 from allianceauth.services.modules.discord.models import DiscordUser
 
-from lawn_compliance.tasks import send_alliance_compliance
+from lawn_compliance.tasks import send_alliance_compliance, send_corp_compliance
 
 logger = get_extension_logger(__name__)
 
@@ -33,92 +32,30 @@ class Compliance(commands.Cog):
         guild_ids=[int(settings.DISCORD_GUILD_ID)],
     )
 
-    # generates a corp embed
-
-    def get_corp_embed(self, input_corp):
-        embed = Embed(title=f"{input_corp} Compliance")
-        try:
-            corp = models.CorpStat.objects.get(
-                corp_id__corporation_name__iexact=input_corp
-            )
-            (
-                members,
-                mains,
-                orphans,
-                unregistered,
-                total_mains,
-                total_unreg,
-                total_members,
-                auth_percent,
-                alt_ratio,
-                service_percent,
-                tracking,
-                services,
-            ) = corp.get_stats()
-
-            embed.set_thumbnail(url=corp.corp_logo())
-            embed.add_field(name="Mains", value=total_mains, inline=True)
-            embed.add_field(name="Members", value=total_members, inline=True)
-            embed.add_field(name="Unregistered", value=total_unreg, inline=True)
-
-            svcstring = ""
-            for service in services:
-                percent = service_percent[service]["percent"]
-                # Add icons based on the percentage
-                if percent == 100.0:
-                    icon = "✅"
-                elif percent >= 75.0:
-                    icon = "🟡"
-                elif percent >= 50.0:
-                    icon = "🟠"
-                else:
-                    icon = "🔴"
-
-                svcstring += "{icon} {svc}: {svcpct}%\n".format(
-                    icon=icon, svc=service, svcpct=percent
-                )
-            embed.add_field(name="Services", value=svcstring, inline=False)
-
-            # Helper function to chunk the data into multiple fields
-            def chunk_string(s, chunk_size):
-                return [s[i : i + chunk_size] for i in range(0, len(s), chunk_size)]
-
-            # Generate the unregistered characters list
-            unregistered_characters = "\n".join(
-                f"{x} - Start Date: {x.start_date.strftime('%Y-%m-%d')}"
-                for x in unregistered
-            )
-
-            # Split the string into chunks of up to 1024 characters
-            chunks = chunk_string(unregistered_characters, 1024)
-
-            # Add each chunk as a separate embed field
-            for i, chunk in enumerate(chunks):
-                embed.add_field(
-                    name=f"Unregistered Characters (Part {i + 1})",
-                    value=chunk,
-                    inline=False,
-                )
-
-            embed.colour = Color.blurple()
-        except models.CorpStat.DoesNotExist:
-            embed.colour = Color.red()
-            embed.description = (
-                "Corp **{corp_name}** does not exist in our Auth system"
-            ).format(corp_name=input_corp)
-        return embed
-
     async def search_corps(ctx: AutocompleteContext):
-        """Returns a list of corps that begin with the characters entered so far."""
-        return list(
-            models.CorpStat.objects.filter(
-                corp_id__corporation_name__icontains=ctx.value
-            ).values_list("corp_id__corporation_name", flat=True)[:10]
-        )
+        """
+        Returns a list of corps within a specific alliance that match the characters entered so far.
+        """
 
-    ########
-    # TODO: WE NEED TO MOVE THIS TO A TASK
-    ########
+        try:
+            # Get the specified alliance
+            ally = EveAllianceInfo.objects.get(alliance_id=150097440)
+
+            # Filter corporations by alliance and search term
+            matching_corps = (
+                EveCorporationInfo.objects.filter(
+                    alliance=ally, corporation_name__icontains=ctx.value
+                )
+                .order_by("corporation_name")
+                .values_list("corporation_name", flat=True)[:10]
+            )
+
+            return list(matching_corps)
+
+        except EveAllianceInfo.DoesNotExist:
+            # Return an empty list if the alliance doesn't exist
+            return []
+
     # alliance command
     @compliance_commands.command(
         name="alliance", guild_ids=[int(settings.DISCORD_GUILD_ID)], pass_context=True
@@ -149,7 +86,10 @@ class Compliance(commands.Cog):
         Returns compliance data for selected corp
         """
         await ctx.defer(ephemeral=False)
-        await ctx.respond(embed=self.get_corp_embed(corp), ephemeral=False)
+        send_corp_compliance.delay(
+            input_corp=corp, channel_id=settings.LAWN_COMPLIANCE_CHANNEL[0]
+        )
+        await ctx.respond(f"Requested compliance data for **{corp}**.", ephemeral=False)
 
     # own corp command
     @compliance_commands.command(
@@ -173,14 +113,17 @@ class Compliance(commands.Cog):
             profile = user.profile
             mchar = profile.main_character
             corp = mchar.corporation_name
-            await ctx.respond(embed=self.get_corp_embed(corp), ephemeral=True)
-        except Exception:
-            logger.error("Could not figure out who made the request")
+            send_corp_compliance.delay(input_corp=corp, user_id=ctx.author.id)
             await ctx.respond(
-                message="Corp token missing from Corporation Stats Module! Please add your token in alliance auth!",
+                f"Sent compliance data for your corp, **{corp}**, via DM.",
                 ephemeral=True,
             )
-            pass
+        except Exception as e:
+            logger.error("Failed to determine the requester's corp: %s", e)
+            await ctx.respond(
+                message="Unable to retrieve your corp data. Please check your tokens in the alliance auth system.",
+                ephemeral=True,
+            )
 
 
 def setup(bot):

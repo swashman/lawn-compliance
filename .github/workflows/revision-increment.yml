@@ -1,0 +1,54 @@
+name: Auto Increment Version
+
+on:
+  push:
+    branches:
+      - master  # Replace 'main' with your default branch if different
+
+jobs:
+  increment_version:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+
+      - name: Find and Increment Version in Target __init__.py
+        id: version
+        run: |
+          # Find the __init__.py file that contains the __version__ attribute
+          version_file=$(grep -rl '__version__ =' */__init__.py | head -n 1)
+
+          if [ -z "$version_file" ]; then
+            echo "No __init__.py file with __version__ attribute found."
+            exit 1
+          fi
+
+          echo "Version file located at: $version_file"
+
+          # Extract current version and increment the revision
+          current_version=$(grep -Po '(?<=__version__ = ")(\d+\.\d+\.)(\d+)(?=")' $version_file)
+          major_minor=$(echo $current_version | grep -Po '(\d+\.\d+\.?)')
+          revision=$(echo $current_version | grep -Po '(\d+)$')
+          new_revision=$((revision + 1))
+          new_version="${major_minor}${new_revision}"
+          echo "New version: $new_version"
+
+          # Update the version in __init__.py
+          sed -i "s/__version__ = .*/__version__ = \"$new_version\"/" $version_file
+
+      - name: Commit and push new version
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git status  # To confirm the path of modified files
+          git add .  # Stage all changes (you can replace '.' with the exact path if needed)
+          git commit -m "Incremented version"
+          git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
